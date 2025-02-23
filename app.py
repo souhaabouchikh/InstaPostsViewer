@@ -28,5 +28,10 @@ def handler(event, context):
 def index():
     return 'Hello from Flask!'
 
+# This is the main entry point for Vercel (or another serverless platform)
+def main(event, context):
+    return handler(event, context)
+
+# For local development, use Flask app as usual
 if __name__ == '__main__':
     app.run(debug=True)
