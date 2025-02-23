@@ -1,39 +1,32 @@
-from flask import Flask, request, jsonify, render_template
-import requests
-from bs4 import BeautifulSoup
+from flask import Flask, request, jsonify
+import json
 
 app = Flask(__name__)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/extract', methods=['POST'])
-def extract():
-    url = request.form.get('url')
-    if not url:
-        return jsonify({'error': 'No URL provided'}), 400
-
+# Define a handler function for serverless invocation
+def handler(event, context):
     try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # Extract video URL
-        video_element = soup.find('video')
-        if video_element:
-            video_url = video_element['src']
-            return jsonify({'video_url': video_url})
-
-        # Extract image URL
-        image_element = soup.find('img')
-        if image_element:
-            image_url = image_element['src']
-            return jsonify({'image_url': image_url})
-
-        return jsonify({'error': 'Media not found'}), 404
-
+        # Handle HTTP requests
+        if event.get('httpMethod') == 'GET':
+            return {
+                'statusCode': 200,
+                'body': json.dumps({'message': 'Hello from Flask!'})
+            }
+        else:
+            return {
+                'statusCode': 405,
+                'body': json.dumps({'error': 'Method Not Allowed'})
+            }
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
+
+# For local development, use the Flask app as usual
+@app.route('/', methods=['GET'])
+def index():
+    return 'Hello from Flask!'
 
 if __name__ == '__main__':
     app.run(debug=True)
